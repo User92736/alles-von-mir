@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reaktionsgame</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/User92736/Style.css@main/style.css">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/252/252590.png">
+</head>
+<body>
+    <header>Reaktionsgame</header>
+    <div class="container">
+        <br>
+        <button onclick="stopTimer(); auswerten(); return false" id="buttonStop">Hier Drücken!</button>
+        <button onclick="window.location.reload(); return false" id="buttonSeiteNeuLaden">Wiederhohlen</button>
+        <br>
+        <button onclick="startTimer(); updateMenu(); return false" id="buttonStart">START!</button>
+        <button onclick="showAnleitung(); return false" id="buttonAnleitung">Anleitung</button>
+        <h1 id="zeitanzeige"></h1>
+        <h2 id="anleitung">
+            Wilkommen beim Reaktionsgame <br><br>
+            Wenn du auf "START!" klickst, hast du einen Knopf und  eine Anzeige. <br>
+            Auf der Anzeige steht "Achtung!". <br>
+            Sobald auf der Anzeige "Jetzt!" steht, musst du möglichst schnell auf den Knopf drücken. <br>
+            Danach wird deine Zeit angezeigt. <br>
+            Drücke auf "Wiederhohlen" um die Seite neu zu laden und du kannst von Vorne beginnen. <br><br>
+            Viel Spass! 😊
+        </h2>
+        <button onclick="zurück(); return false" id="buttonZurück">Zurück</button>
+    </div>
+    <script>
+        // Variablen
+
+        let timer = 0;
+        let warten = 0;
+        let sekunden = 0;
+        let zehntel = 0;
+        let hundertstel = 0;
+        let hundertstelInsgesamt = 0;
+        let deineZeit = 0;
+        let zufallszeit = 0;
+
+
+        // Const-Befehle
+
+        const buttonStop = document.getElementById("buttonStop");
+        const buttonSeiteNeuLaden = document.getElementById("buttonSeiteNeuLaden");
+        const buttonStart = document.getElementById("buttonStart");
+        const buttonAnleitung = document.getElementById("buttonAnleitung");
+        const anleitung = document.getElementById("anleitung");
+        const buttonZurück = document.getElementById("buttonZurück");
+
+
+        // UI Startbildschirm
+
+        buttonStop.style.visibility = "hidden";
+        buttonSeiteNeuLaden.style.visibility = "hidden";
+        anleitung.style.visibility = "hidden";
+        buttonZurück.style.visibility = "hidden";
+
+
+        // Menu-Funktionen
+
+        function showAnleitung() {
+            buttonStart.style.visibility = "hidden";
+            buttonAnleitung.style.visibility = "hidden";
+            anleitung.style.visibility = "visible";
+            buttonZurück.style.visibility = "visible";
+        }
+        function zurück() {
+            buttonStart.style.visibility = "visible";
+            buttonAnleitung.style.visibility = "visible";
+            anleitung.style.visibility = "hidden";
+            buttonZurück.style.visibility = "hidden";
+        }
+        function updateMenu() {
+            buttonStop.style.visibility = "visible";
+            buttonStart.style.visibility = "hidden";
+            buttonAnleitung.style.visibility = "hidden";
+            zeitanzeige.innerHTML = "Achtung!";
+        }
+
+
+        // Wenn START! gedrückt
+
+        function startTimer() {
+            
+            // Zufallszeit warten
+
+            zufallszeit = Math.random() * 8 + 2;
+            warten = setTimeout(() => {
+
+                // starte Timer
+
+                timer = setInterval(() => {
+                    hundertstelInsgesamt++
+                    hundertstel++
+                    if(hundertstel == 10) {
+                        hundertstel = 0;
+                        zehntel++
+                    }
+                    if(zehntel == 10) {
+                        zehntel = 0;
+                        sekunden++
+                    }
+                    deineZeit = sekunden + ":" + zehntel + hundertstel;
+                    zeitanzeige.innerHTML = "Jetzt! " + deineZeit;
+                }, 10);
+            }, zufallszeit * 1000);
+        }
+
+
+        // stoppe Timer
+
+        function stopTimer() {
+            clearInterval(timer);
+            buttonStop.style.visibility = "hidden";
+            buttonSeiteNeuLaden.style.visibility = "visible";
+        }
+
+
+        // auswerten
+
+        function auswerten() {
+            if(hundertstelInsgesamt == 0) {
+                zeitanzeige.innerHTML = "Etwas zu früh!";
+                clearTimeout(warten);
+            }
+            if(hundertstelInsgesamt < 25 & hundertstelInsgesamt > 0) {
+                zeitanzeige.innerHTML = "Wow! Das war schnell! " + "Deine Zeit: " + deineZeit;
+            }
+            if(hundertstelInsgesamt < 50 & (hundertstelInsgesamt > 25 || hundertstelInsgesamt == 25)) {
+                zeitanzeige.innerHTML = "Sehr gut! " + "Deine Zeit: " + deineZeit;
+            }
+            if(hundertstelInsgesamt < 75 & (hundertstelInsgesamt > 50 || hundertstelInsgesamt == 50)) {
+                zeitanzeige.innerHTML = "Gut! Aber das kannst du berstimmt besser! " + "Deine Zeit: " + deineZeit;
+            }
+            if((hundertstelInsgesamt > 100 || hundertstelInsgesamt == 100) || hundertstelInsgesamt == 75) {
+                zeitanzeige.innerHTML = "Gib dir bitte etwas mehr Mühe! " + "Deine Zeit: " + deineZeit;
+            }
+        }
+    </script>
+</body>
+</html>

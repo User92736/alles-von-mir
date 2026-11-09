@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Textentschlüsselung</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="https://images.squarespace-cdn.com/content/v1/5ef2ceb8ea30127cb1f46c43/393fda61-7564-4875-af5c-48ca4393a235/2001978.png">
+    <style>
+        body {
+            background-color: #0011ff;
+        }
+        header {
+            background-color: #001195;
+            font-family: 'Open Sans', sans-serif;
+            color: white;
+            padding: 16px 100px;
+            font-size: 24px;
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 0;
+        }
+        button {
+            position: absolute;
+            background-color: red;
+            color: black;
+            font-size: large;
+            font-weight: bold;
+            border: none;
+            top: 100px;
+            left: 100px;
+            height: 40px;
+            width: 200px;
+        }
+        button:hover {
+            background-color: rgb(197, 0, 0);
+            cursor: pointer;
+        }
+        label {
+            display: flex;
+        }
+        .upload1 {
+            color: white;
+            background-color: black;
+            border: solid 2px white;
+            font-family: 'Open Sans', sans-serif;
+            font-size: large;
+            cursor: pointer;
+            position: absolute;
+            top: 200px;
+            left: 100px;
+            height: 50px;
+            width: 500px;
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+        }
+        .upload2 {
+            color: white;
+            background-color: black;
+            border: solid 2px white;
+            font-family: 'Open Sans', sans-serif;
+            font-size: large;
+            cursor: pointer;
+            position: absolute;
+            top: 270px;
+            left: 100px;
+            height: 50px;
+            width: 500px;
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+        }
+        .upload1.success {
+            background-color: rgb(0, 194, 0);
+        }
+        .upload2.success {
+            background-color: rgb(0, 194, 0);
+        }
+        input {
+            display: none;
+        }
+        textarea {
+            visibility: hidden;
+            position: absolute;
+            color: white;
+            font-family: 'Open Sans', sans-serif;
+            background-color: #2f3dff;
+            border: white solid;
+            padding: 8px;
+            font-size: large;
+            height: 300px;
+            width: 1000px;
+            top: 200px;
+            left: 100px;
+        }
+        p {
+            visibility: hidden;
+            position: absolute;
+            color: white;
+            font-family: 'Open Sans', sans-serif;
+            font-weight: bold;
+            font-size: large;
+            top: 160px;
+            left: 100px;
+        }
+    </style>
+</head>
+<body>
+    <header>Textentschlüsselung</header>
+    <div class="container">
+        <input type="file" id="input1" class="upload1" accept=".txt"> <label for="input1" id="label1" class="upload1">Verschlüsselter Text hochladen</label>
+        <input type="file" id="input2" class="upload2" accept=".txt"> <label for="input2" id="label2" class="upload2">Schlüssel hochladen</label>
+        <button id="button">Entschlüsseln</button>
+        <textarea id="output" type="text"></textarea><p id="p">Entschlüsselter Text:</p>
+    </div>
+    <script>
+        input1.addEventListener('change', () => {
+            if (input1.files.length > 0) {label1.classList.add('success')} else {label1.classList.remove('success')}
+        });
+        input2.addEventListener('change', () => {
+            if (input2.files.length > 0) {label2.classList.add('success')} else {label2.classList.remove('success')}
+        });
+        const randomKeyZeichen = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789§°+*ç%&/()=?^!¨äöüèéà-_.:,;<>{}[]@|~€$ ";
+        function zeichenzuzahl(zeichen) {
+            return randomKeyZeichen.indexOf(zeichen);
+        }
+        function zahlzuzeichen(zahl) {
+            return randomKeyZeichen[zahl];
+        }
+        function textEntschluesseln(schluessel, text) {
+            const laenge = randomKeyZeichen.length;
+            let entschluesselterText = "";
+            for (let i = 0; i < text.length; i++) {
+                const buchstabeText = text[i];
+                const buchstabeKey = schluessel[i % schluessel.length];
+                const keyIndex = zeichenzuzahl(buchstabeKey);
+                const textIndex = zeichenzuzahl(buchstabeText);
+                if (textIndex === -1 || keyIndex === -1) {
+                    entschluesselterText += buchstabeText;
+                    continue;
+                }
+                const originalIndex = (textIndex - keyIndex + laenge) % laenge;
+                entschluesselterText += zahlzuzeichen(originalIndex);
+            }
+            return entschluesselterText
+        }
+        button.addEventListener('click', async () => {
+            const keyFile = document.getElementById("input2").files[0];
+            const textFile = document.getElementById("input1").files[0];
+            if (!keyFile || !textFile) {
+                alert("Bitte lade den Schlüssel und den Verschlüsselten Text hoch!");
+                return;
+            }
+            try {
+                const key = await keyFile.text();
+                const text = await textFile.text();
+                const ergebnis = textEntschluesseln(key.trim(), text);
+                output.style.visibility = "visible";p.style.visibility = "visible";
+                input1.style.visibility = "hidden"; input2.style.visibility = "hidden";
+                label1.style.visibility = "hidden"; label2.style.visibility = "hidden";
+                output.innerHTML = ergebnis;
+            } catch (fehler) {
+                output.style.visibility = "visible";
+                input1.style.visibility = "hidden"; input2.style.visibility = "hidden";
+                label1.style.visibility = "hidden"; label2.style.visibility = "hidden";
+                output.innerHTML = "Beim Entschlüsseln ist ein Fehler Aufgetreten:\n\n" + fehler;
+            }
+        });
+    </script>
+</body>
+</html>
