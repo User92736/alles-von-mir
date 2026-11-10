@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stoppuhr</title>
+    <script>
+        if (window.matchMedia("(min-width: 750px)").matches) {
+            window.open('https://cdn.jsdelivr.net/gh/User92736/alles-von-mir@main/zu-kleiner-bildschirm.txt');
+        }
+    </script>
+    <style>
+        button:disabled {background-color: #b8b8b8; cursor: not-allowed;}
+        button:disabled:hover {background-color: #a3a3a3}
+    </style>
+    <link rel="icon" href="https://images.emojiterra.com/twitter/v14.0/512px/23f1.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/User92736/Style.css@main/style.css">
+</head>
+<body>
+    <header>Stoppuhr</header>
+    <div class="container">
+        <h1 id="anzeige">0:00:00:00</h1>
+        <button id="Start" onclick="Start()">Start</button>
+        <button id="Stop" onclick="Stop()">Stop</button>
+        <button id="Reset" onclick="Reset()">Reset</button>
+    </div>
+    <script>
+        let hundertstel = 0;
+        let zehntel = 0;
+        let sekunden = 0;
+        let zehn_sekunden = 0;
+        let minuten = 0;
+        let zehn_minuten = 0;
+        let stunden = 0;
+        let time;
+        let timer = null;
+        const buttonStart = document.getElementById("Start");
+        const buttonStop = document.getElementById("Stop");
+        const buttonReset = document.getElementById("Reset");
+        buttonStop.setAttribute("disabled", "");
+        buttonReset.setAttribute("disabled", "");
+        function Start() {
+            buttonStart.setAttribute("disabled", "");
+            buttonStop.removeAttribute("disabled");
+            buttonReset.setAttribute("disabled", "");
+            timer = setInterval(() => {
+                hundertstel++;
+                if(hundertstel == 10) {zehntel++; hundertstel = 0;}
+                if(zehntel == 10) {sekunden++; zehntel = 0;}
+                if(sekunden == 10) {zehn_sekunden++; sekunden = 0;}
+                if(zehn_sekunden == 6) {minuten++; zehn_sekunden = 0;}
+                if(minuten == 10) {zehn_minuten++; minuten = 0;}
+                if(zehn_minuten == 6) {stunden++; zehn_minuten = 0;}
+                time = stunden + ":" + zehn_minuten + minuten + ":" + zehn_sekunden + sekunden + ":" + zehntel + hundertstel;
+                anzeige.innerHTML = time;
+                document.title = stunden + ":" + zehn_minuten + minuten + ":" + zehn_sekunden + sekunden + " - Stoppuhr";
+            }, 10);
+        }
+        function Stop() {
+            clearInterval(timer);
+            buttonStart.removeAttribute("disabled");
+            buttonStop.setAttribute("disabled", "");
+            buttonReset.removeAttribute("disabled");
+        }
+        function Reset() {
+            buttonReset.setAttribute("disabled", "");
+            hundertstel = 0;
+            zehntel = 0;
+            sekunden = 0;
+            zehn_sekunden = 0;
+            minuten = 0;
+            zehn_minuten = 0;
+            stunden = 0;
+            time = 0;
+            timer = null;
+            anzeige.innerHTML = "0:00:00:00";
+            document.title = "Stoppuhr";
+        }
+    </script>
+</body>
+</html>
